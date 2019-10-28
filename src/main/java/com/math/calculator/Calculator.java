@@ -12,14 +12,7 @@ public class Calculator {
     }
 
     private String removeWhiteMarks() {
-        StringBuilder result = new StringBuilder();
-
-        for (int i = 0; i < this.equation.length(); i++) {
-            if (this.equation.charAt(i) > 32) {
-                result.append(this.equation.charAt(i));
-            }
-        }
-        return result.toString();
+        return equation.replaceAll("\\s", "");
     }
 
     public String runSolver() {
