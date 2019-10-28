@@ -15,6 +15,10 @@ public class Calculator {
         return equation.replaceAll("\\s", "");
     }
 
+    private int checkBrackets() {
+
+    }
+
     public String runSolver() {
         String result = "";
 
