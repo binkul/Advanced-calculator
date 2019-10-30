@@ -50,7 +50,7 @@ public class AlgorithmRPN {
         }
     }
 
-    private static List<String> changeToRPN(String equation) {
+    private static List<String> buildRPN(String equation) {
         List<String> output = new ArrayList<String>();
         Deque<String> stack = new ArrayDeque<String>();
         char tmpChar;

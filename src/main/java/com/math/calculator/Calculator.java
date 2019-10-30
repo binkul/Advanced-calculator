@@ -2,18 +2,16 @@ package com.math.calculator;
 
 import java.util.*;
 
-public class Calculator {
-    private static final String [] OPERATORS = {"+", "-", "*", "/", "%", "sin", "cos", "ln", "log", "^"};
-    private static final int[] OPERATORS_PRIORITY = {0, 0, 1, 1, 1, 2, 2, 2, 2, 3};
+class Calculator {
     private String equation;
     private List<String> equationRPN;
 
-    public Calculator() {
+    Calculator() {
         this.equation = "";
         this.equationRPN = new ArrayList<String>();
     }
 
-    public void putEquation(String equation) {
+    void putEquation(String equation) {
         this.equation = equation;
     }
 
@@ -78,7 +76,7 @@ public class Calculator {
         return true;
     }
 
-    public String runSolver() {
+    String runSolver() {
         String result = "Try again ...";
 
         this.equation = removeWhiteMarks(this.equation);
