@@ -2,9 +2,9 @@ package com.math.calculator;
 
 import java.util.Scanner;
 
-public class ReadEquation {
+class ReadEquation {
 
-    public static String putEquation() {
+    static String putEquation() {
         Scanner scanner = new Scanner(System.in);
         String result;
 
