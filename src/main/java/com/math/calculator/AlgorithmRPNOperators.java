@@ -1,31 +1,71 @@
 package com.math.calculator;
 
 class AlgorithmRPNOperators {
+    /*
+    Data for Operators:
+    [0] - Symbol of operator/function
+    [1] - Priority/Function or Operator/Left-sided or Right-sided
+    '(' must have the lowest priority
+     */
     private static final String [][] OPERATORS_AND_PRIORITY = {
-            {"(", "0"},
-            {"+", "1"},
-            {"-", "1"},
-            {"*", "2"},
-            {"/", "2"},
-            {"%", "2"},
-            {"sin", "3"},
-            {"cos", "3"},
-            {"ln", "3"},
-            {"log", "3"},
-            {"^", "4"}
+            {"(", "0/O/L"},
+            {"+", "1/O/L"},
+            {"-", "1/O/L"},
+            {"*", "2/O/L"},
+            {"/", "2/O/L"},
+            {"%", "2/O/L"},
+            {"sin", "3/F/L"},
+            {"cos", "3/F/L"},
+            {"ln", "3/F/L"},
+            {"log", "3/F/L"},
+            {"lg", "3/F/L"},
+            {"^", "4/O/R"},
+            {"e", "5/F/L"},
+            {"pi", "5/F/L"}
     };
 
-    static int getPriority(String operator) {
-        for (String[] priority : OPERATORS_AND_PRIORITY) { // int i = 0; i < OPERATORS_AND_PRIORITY.length; i++) {
-            if (operator.equals(priority[0])) {
-                return Integer.parseInt(priority[1]);
+    /*
+    Return data for variable operator, or null if not found
+     */
+    static String getOperatorData(String operator) {
+        for (String[] data : OPERATORS_AND_PRIORITY) {
+            if (operator.equals((data[0]))) {
+                return data[1];
             }
         }
+        return null;
+    }
 
-        return -1;
+    static int getPriority(String operator) {
+        String operatorData = getOperatorData(operator);
+
+        if (operatorData != null) {
+            String[] data = operatorData.split("/", 0);
+            return  Integer.parseInt(data[0]);
+        } else {
+            return -1;
+        }
     }
 
     static boolean isFunction(String operator) {
-        return operator.length() > 1;
+        String operatorData = getOperatorData(operator);
+
+        if (operatorData != null) {
+            String[] data = operatorData.split("/", 0);
+            return data[1].equals("F");
+        } else {
+            return false;
+        }
+    }
+
+    static boolean isLeftSide(String operator) {
+        String operatorData = getOperatorData(operator);
+
+        if (operatorData != null) {
+            String[] data = operatorData.split("/", 0);
+            return data[2].equals("L");
+        } else {
+            return false;
+        }
     }
 }

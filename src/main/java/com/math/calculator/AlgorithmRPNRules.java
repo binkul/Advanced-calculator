@@ -6,66 +6,47 @@ class AlgorithmRPNRules {
         return result.replaceAll("\\s", "");
     }
 
-    private static int countBrackets(String equation) {
-        int result;
-        char tmpChar;
-
-        result = 0;
-        for (int i = 0; i < equation.length(); i++) {
-            tmpChar = equation.charAt(i);
-            if (tmpChar == '(') {
-                result++;
-            } else if (tmpChar == ')') {
-                result--;
-            }
+    static boolean tryParseDouble(String value) {
+        try {
+            Double.parseDouble(value);
+            return true;
+        } catch(Exception e) {
+            printVariableError(value);
+            return false;
         }
-        return result;
     }
 
-    private static boolean checkBrackets(String equation) {
-        int result = countBrackets(equation);
-
-        if (result < 0) {
-            System.out.println("Error - missing open bracket '(' ");
-        } else if (result > 0) {
-            System.out.println( "Error - missing close bracket ')");
-        }
-
-        return result == 0;
-    }
-
-    private static boolean checkLength(String equation) {
+    static boolean checkLength(String equation) {
         int length = equation.length();
 
         if (length == 0) {
-            System.out.println("Error - equation is empty ...");
+            printLengthError();
         }
 
         return equation.length() > 0;
     }
 
-    private static boolean checkFunction(String equation) {
-        char tmpChar;
-        String function;
-        int i = 0;
-
-        while (i < equation.length()) {
-            tmpChar = equation.charAt(i);
-            if (tmpChar >= 'a' && tmpChar <= 'z') {
-                function = AlgorithmRPN.getFunction(i, equation);
-                if (AlgorithmRPNOperators.getPriority(function) == -1) {
-                    System.out.println("Function: '" + function + "' does not exists.");
-                    return false;
-                }
-                i += function.length() - 1;
-            }
-            i++;
-        }
-
-        return true;
+    static void printOperatorError(char operator) {
+        System.out.println("Error - unknown operator '" + operator + "'");
     }
 
-    static boolean checkRules(String equation) {
-        return checkLength(equation) && checkBrackets(equation) && checkFunction(equation);
+    private static void printVariableError(String value) {
+        System.out.println("Error - value: '" + value + "' is not a number.");
+    }
+
+    private static void printLengthError() {
+        System.out.println("Error - equation is empty ...");
+    }
+
+    static void printFunctionError(String function) {
+        System.out.println("Error - function: '" + function + "' does not exists.");
+    }
+
+    static void printCloseBracketsError() {
+        System.out.println("Error - missing one or more closing brackets ')' ");
+    }
+
+    static void printOpenBracketsError() {
+        System.out.println("Error - missing one or more opening brackets '(' ");
     }
 }

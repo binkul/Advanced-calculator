@@ -1,31 +1,33 @@
 package com.math.calculator;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.util.List;
+import java.util.*;
 
 @SpringBootApplication
 public class CalculatorApplication {
 
+    private static void calculate(String equation) {
+        List<String> rpnSeries;
+        String equationRPN = AlgorithmRPNRules.removeWhiteMarks(equation);
+
+        rpnSeries = AlgorithmRPN.buildRPN(equationRPN);
+        if (rpnSeries != null) {
+            for (String value : rpnSeries) {
+                System.out.print(value + " ");
+            }
+            System.out.println();
+        } else {
+            System.out.println("Try again ...");
+        }
+    }
+
     public static void main(String[] args) {
         String equation;
-        List<String> rpnSeries;
 
         while (true) {
             equation = ReadEquation.putEquation();
             if (!equation.equals("stop")) {
-                equation = AlgorithmRPNRules.removeWhiteMarks(equation);
-                if (AlgorithmRPNRules.checkRules(equation)) {
-                    rpnSeries = AlgorithmRPN.buildRPN(equation);
-                    if (rpnSeries != null) {
-                        for (int i = 0; i < rpnSeries.size(); i++) {
-                            System.out.print(rpnSeries.get(i) + " ");
-                        }
-                        System.out.println();
-                    }
-                } else {
-                    System.out.println("Try again ...");
-                }
+                calculate(equation);
             } else {
                 break;
             }
