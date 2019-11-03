@@ -9,7 +9,7 @@ class ReadEquation {
         String result;
 
         System.out.println("Enter the equation ('stop' finish program):");
-        result = scanner.nextLine().trim().toLowerCase();
+        result = scanner.nextLine();
         return result;
     }
 }

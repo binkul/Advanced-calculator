@@ -2,47 +2,15 @@ package com.math.calculator;
 
 import java.util.*;
 
-class AlgorithmRPN {
-
-    private static String getVariableFromEquation(int start, String equation) {
-        char tmpChar;
-        StringBuilder result = new StringBuilder();
-
-        for (int i = start; i < equation.length(); i++) {
-            tmpChar = equation.charAt(i);
-            if ((tmpChar >= '0' && tmpChar <= '9') || tmpChar == '.') {
-                result.append(tmpChar);
-            } else {
-                break;
-            }
-        }
-
-        return result.toString();
-    }
-
-    private static String getFunctionFromEquation(int start, String equation) {
-        char tmpChar;
-        StringBuilder result = new StringBuilder();
-
-        for (int i = start; i < equation.length(); i++) {
-            tmpChar = equation.charAt(i);
-            if (tmpChar >= 'a' && tmpChar <= 'z') {
-                result.append(tmpChar);
-            } else {
-                break;
-            }
-        }
-
-        return result.toString();
-    }
+class RPNBuilder {
 
     private static String pushFunction(int start, String equation, Deque<String> stack, List<String> output) {
-        String function = getFunctionFromEquation(start, equation);
+        String function = RPNVeryfication.getFunctionFromEquation(start, equation);
 
-        if (AlgorithmRPNOperators.getOperatorData(function) != null) {
+        if (RPNOperators.isFunction(function)) {
             pushOperator(function, stack, output);
         } else {
-            AlgorithmRPNRules.printFunctionError(function);
+            RPNErrors.printFunctionError(function);
             return null;
         }
 
@@ -55,9 +23,9 @@ class AlgorithmRPN {
     }
 
     private static String pushVariable(int start, String equation, List<String> output) {
-        String variableString = getVariableFromEquation(start, equation);
+        String variableString = RPNVeryfication.getVariableFromEquation(start, equation);
 
-        if (AlgorithmRPNRules.tryParseDouble(variableString)) {
+        if (RPNVeryfication.tryParseDouble(variableString)) {
             output.add(variableString);
         } else {
             return null;
@@ -67,16 +35,17 @@ class AlgorithmRPN {
     }
 
     private static void popOfHigherPriority(String operator, Deque<String> stack, List<String> output) {
-        int priorityOfNew = AlgorithmRPNOperators.getPriority(operator);
+        boolean leftSideOfNew = RPNOperators.isLeftSide(operator);
+        int priorityOfNew = RPNOperators.getPriority(operator);
         int priorityOfOld;
         int maxSize = stack.size();
         String operatorFromStack;
 
         for (int i = 0; i < maxSize; i++) {
             operatorFromStack = stack.peek();
-            priorityOfOld = AlgorithmRPNOperators.getPriority(operatorFromStack);
+            priorityOfOld = RPNOperators.getPriority(operatorFromStack);
 
-            if (AlgorithmRPNOperators.isLeftSide(operator)) {
+            if (leftSideOfNew) {
                 if (priorityOfOld >= priorityOfNew) {
                     output.add(stack.pop());
                 }
@@ -92,23 +61,29 @@ class AlgorithmRPN {
         int maxSize = stack.size();
         String operatorFromStack;
 
+        // pop/add all operators until '('
         for (int i = 0; i < maxSize; i++) {
             operatorFromStack = stack.peek();
             if (operatorFromStack != null && !operatorFromStack.equals("(")) {
                 output.add(stack.pop());
             } else {
-                stack.pop();
                 break;
             }
         }
 
+        // pop '(' - if there is nothing to pop then error 'not ( bracket'
         if (stack.size() > 0) {
-            if (AlgorithmRPNOperators.isFunction(stack.peek())) {
+            stack.pop();
+        } else {
+            RPNErrors.printOpenBracketsError();
+            return false;
+        }
+
+        // check and pop/add next, only, if it is function
+        if (stack.size() > 0) {
+            if (RPNOperators.isFunction(stack.peek())) {
                 output.add(stack.pop());
             }
-        } else {
-            AlgorithmRPNRules.printOpenBracketsError();
-            return false;
         }
 
         return true;
@@ -136,51 +111,45 @@ class AlgorithmRPN {
         String tmpValue;
         int i = 0;
 
-        if (!AlgorithmRPNRules.checkLength(equation)) {
+        if (!RPNVeryfication.checkLength(equation)) {
             return null;
         }
 
         while (i < equation.length()) {
             tmpChar = equation.charAt(i);
-            if ((tmpChar >= '0' && tmpChar <= '9') || tmpChar == '.') {
+            if (RPNVeryfication.isNumber(tmpChar)) {
                 if ((tmpValue = pushVariable(i, equation, output)) == null) {
                     return null;
                 }
-                i += tmpValue.length() - 1;
-            } else if (tmpChar >= 'a' && tmpChar <= 'z') {
+            } else if (RPNVeryfication.isLetter(tmpChar)) {
                 if ((tmpValue = pushFunction(i, equation, stack, output)) == null) {
                     return null;
                 }
-                i += tmpValue.length() - 1;
-            } else if (tmpChar == ')') {
+            } else if (RPNVeryfication.isCloseBracket(tmpChar)) {
+                tmpValue = String.valueOf(tmpChar);
                 if (!popToOpenBracket(stack, output)) {
                     return null;
                 }
-            } else if (tmpChar == '(') {
-                stack.push(String.valueOf(tmpChar));
-            } else if (tmpChar == '+') {
-                pushOperator(String.valueOf(tmpChar), stack, output);
-            } else if (tmpChar == '-') {
-                pushOperator(String.valueOf(tmpChar), stack, output);
-            } else if (tmpChar == '*') {
-                pushOperator(String.valueOf(tmpChar), stack, output);
-            } else if (tmpChar == '/') {
-                pushOperator(String.valueOf(tmpChar), stack, output);
-            } else if (tmpChar == '%') {
-                pushOperator(String.valueOf(tmpChar), stack, output);
-            } else if (tmpChar == '^') {
-                pushOperator(String.valueOf(tmpChar), stack, output);
+            } else if (RPNVeryfication.isOpenBracket(tmpChar)) {
+                tmpValue = String.valueOf(tmpChar);
+                stack.push(tmpValue);
+            } else if (RPNOperators.isOperator(String.valueOf(tmpChar))) {
+                tmpValue = String.valueOf(tmpChar);
+                pushOperator(tmpValue, stack, output);
+            } else if (RPNVeryfication.isWhiteMark(tmpChar)) {
+                tmpValue = String.valueOf(tmpChar);
             } else {
-                AlgorithmRPNRules.printOperatorError(tmpChar);
+                RPNErrors.printOperatorError(tmpChar);
                 return null;
             }
-            i++;
+            i += tmpValue.length();
         }
 
         if (!popAll(stack, output)) {
-            AlgorithmRPNRules.printCloseBracketsError();
+            RPNErrors.printCloseBracketsError();
         }
 
         return output;
     }
+
 }

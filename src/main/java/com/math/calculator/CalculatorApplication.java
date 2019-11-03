@@ -8,14 +8,15 @@ public class CalculatorApplication {
 
     private static void calculate(String equation) {
         List<String> rpnSeries;
-        String equationRPN = AlgorithmRPNRules.removeWhiteMarks(equation);
+        Double result;
 
-        rpnSeries = AlgorithmRPN.buildRPN(equationRPN);
-        if (rpnSeries != null) {
-            for (String value : rpnSeries) {
-                System.out.print(value + " ");
-            }
-            System.out.println();
+        if ((rpnSeries = RPNBuilder.buildRPN(equation)) == null) {
+            System.out.println("Try again ...");
+            return;
+        }
+
+        if ((result = RPNCalculator.calculateRPN(rpnSeries)) != null) {
+            System.out.println(equation + " = " + result);
         } else {
             System.out.println("Try again ...");
         }
