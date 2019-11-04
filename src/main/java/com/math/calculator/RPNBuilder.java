@@ -7,7 +7,7 @@ class RPNBuilder {
     private static String pushFunction(int start, String equation, Deque<String> stack, List<String> output) {
         String function = RPNVeryfication.getFunctionFromEquation(start, equation);
 
-        if (RPNOperators.isFunction(function)) {
+        if (RPNOperators.isExist(function) != null) { // isFunction(function)) {
             pushOperator(function, stack, output);
         } else {
             RPNErrors.printFunctionError(function);
